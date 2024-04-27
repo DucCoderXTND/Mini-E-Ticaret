@@ -1,5 +1,6 @@
 ﻿
 using ETicaretAPI.Application.Repositories;
+using ETicaretAPI.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,23 +12,27 @@ namespace ETicaretAPI.API.Controllers
     {
         private readonly IProductWriteRepository _productWrite;
         private readonly IProductReadRepository _productRead;
+        private readonly IOrderWriteRepository _orderWrite;
+        private readonly ICustomerWriteRepository _customerWrite;
+        private readonly IOrderReadRepository _orderRead;
 
-        public ProductsController(IProductWriteRepository productWrite, IProductReadRepository productRead)
+        public ProductsController(IProductWriteRepository productWrite,
+            IProductReadRepository productRead, IOrderWriteRepository orderWrite, 
+            ICustomerWriteRepository customerWrite, IOrderReadRepository orderRead)
         {
             _productWrite = productWrite;
             _productRead = productRead;
+            _orderWrite = orderWrite;
+            _customerWrite = customerWrite;
+            _orderRead = orderRead;
         }
         [HttpGet]
-        public async void Get()
+        public async Task Get()
         {
-            await _productWrite.AddRangeAsync(new()
-            {
-                new(){Id = Guid.NewGuid(), Name = "Product 1", Price = 100, CreatedDate = DateTime.UtcNow, Stock = 10},
-                new(){Id = Guid.NewGuid(), Name = "Product 2", Price = 200, CreatedDate = DateTime.UtcNow, Stock = 20},
-                new(){Id = Guid.NewGuid(), Name = "Product 3", Price = 300, CreatedDate = DateTime.UtcNow, Stock = 30},
-                new(){Id = Guid.NewGuid(), Name = "Product 4", Price = 400, CreatedDate = DateTime.UtcNow, Stock = 40},
-            });
-           var count = await _productWrite.SaveAsync();
+            var order = await _orderRead.GetByIdAsync("8F79F7FE-180F-4FE6-3C8E-08DC66EA03CF");
+            order.Description = "Anh yeu em";
+            await _orderWrite.SaveAsync();
         }
+
     }
 }
